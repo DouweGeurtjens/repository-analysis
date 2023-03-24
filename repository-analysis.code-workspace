@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.codeActionsOnSave": [
+			"source.fixAll"
+		],
+		"editor.formatOnSave": true,
+		"editor.insertSpaces": true,
+		"[python]": {
+			"editor.tabSize": 4
+		},
+		"python.formatting.provider": "yapf",
+	},
+}
