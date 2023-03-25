@@ -1,4 +1,5 @@
 __pycache__/
-
+.mypy_cache/
+repos/*/
 # local env files
 .env*.local
