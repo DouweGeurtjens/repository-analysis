@@ -1,10 +1,13 @@
 import json
+import os
 from pathlib import (Path)
 
 from git import (Repo)
+import matplotlib.pyplot as plt
 from tqdm import (tqdm)
 
 PATH_TO_REPOS = Path('./repos')
+PATH_TO_ANALYSIS_RESULTS = Path('./analysis-results')
 
 
 def clone_repos() -> None:
@@ -24,6 +27,59 @@ def clone_repos() -> None:
             print(repo['id'])
 
 
+def mypy_typedness_analysis() -> None:
+    with open('data/results.json') as f:
+        results = json.load(f)
+        repos = results['items']
+
+        for repo in tqdm(repos):
+            id = repo['id']
+
+            # Only analyse if cloned
+            if Path(f"repos/{id}") not in PATH_TO_REPOS.iterdir():
+                continue
+
+            # See https://github.com/python/mypy/issues/3717 for semantics of the report generated
+            os.system(
+                f"mypy ./repos/{id} --linecount-report ./analysis-results/{id}/"
+            )
+
+
+def basic_plots() -> None:
+    with open('data/results.json') as f:
+        results = json.load(f)
+        repos = results['items']
+
+        typedness_ratios = []
+        x = []
+
+        for repo in tqdm(repos):
+            id = repo['id']
+
+            # Only plot if analysed
+            if Path(f"analysis-results/{id}"
+                    ) not in PATH_TO_ANALYSIS_RESULTS.iterdir():
+                continue
+
+            with open(f'analysis-results/{id}/linecount.txt') as f:
+                lines = f.readlines()
+                first_line = lines[0]
+                values = first_line.split()
+                total_lines = values[0]
+                annotated_lines = values[2]
+
+                if int(total_lines) != 0:
+                    ratio = (int(annotated_lines) / int(total_lines)) * 100
+
+                typedness_ratios.append(ratio)
+
+        x = range(len(typedness_ratios))
+        plt.scatter(x,
+                    typedness_ratios,
+                    c=['r' if i == 0 else 'b' for i in typedness_ratios])
+        plt.show()
+
+
 def main() -> None:
     # General outline
     #   Clone repos according to results from https://seart-ghs.si.usi.ch/
@@ -32,6 +88,8 @@ def main() -> None:
     #   Try to make an initial classification of the type of repository (typehinting vs no typehinting)
     #   Evidently, this naive method of classification is not exhaustive but serves as a rough initial outline
     clone_repos()
+    mypy_typedness_analysis()
+    basic_plots()
 
 
 main()

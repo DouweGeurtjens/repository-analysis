@@ -5,7 +5,7 @@ This repository is a work in progress.
 ## Requirements
 python
 git
-git-lfs
+git-lfs(?)
 
 # Broken repositories
 Some repositories fail during the cloning process for whatever reason. I have yet to resolve these issues, so for now the entries are removed from the `results.json` file and placed into the `removed_results.json` file instead. Below you can find the errors that occured for each broken repository.
