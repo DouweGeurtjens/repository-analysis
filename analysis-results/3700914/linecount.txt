@@ -1,4 +1,4 @@
-  29591   41741    445   1058 total
+  29646   45602    448   1284 total
    3171    3171    139    139 librosa.core.convert
    2715    2851     20     21 librosa.core.spectrum
    2266    2607     40     46 librosa.util.utils
@@ -45,22 +45,29 @@
      63      63      2      2 librosa.core.fft
      58      58      0      0 librosa.util
      37     745      2     40 test_sequence
+     36     754      2     41 test_constantq
      36      73      1      2 librosa.version
      33     733      2     44 test_convert
      31      31      0      0 librosa.feature
+     19    1063      1     55 test_multichannel
      17    2635      1    155 test_core
      17     413      1     24 test_effects
      15      15      0      0 librosa.util.exceptions
      14    1405      1     98 test_util
      14    1087      1     74 test_display
       4       4      0      0 setup
+      0    1025      0     64 test_features
       0     568      0     42 test_segment
       0     566      0     32 test_filters
       0     392      0      1 conf
       0     336      0     22 test_onset
+      0     328      0     25 test_dtw
       0     300      0     22 test_notation
+      0     299      0     16 test_beat
+      0     256      0     20 test_decompose
       0     193      0      8 test_intervals
       0     140      0     17 test_failures
+      0     136      0      5 test_met_features
       0      83      0      1 create_intervals
       0      61      0      4 test_cache
       0      39      0      1 create_author_list
