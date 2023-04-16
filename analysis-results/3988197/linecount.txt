@@ -1,0 +1,8 @@
+     86    1151      0     32 total
+     49      49      0      0 filter_combiner
+     23      23      0      0 setup
+     14      14      0      0 filter_combiner.config
+      0     436      0      7 fop
+      0     274      0     12 filter_combiner.combiner
+      0     184      0      5 filter_combiner.parser
+      0     171      0      8 filter_combiner.sources

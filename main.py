@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import (Path)
+import subprocess
 
 from git import (Repo)
 import matplotlib.pyplot as plt
@@ -35,14 +36,22 @@ def mypy_typedness_analysis() -> None:
         for repo in tqdm(repos):
             id = repo['id']
 
+            # Mypy bricks on this repo
+            if id == 3992617:
+                continue
             # Only analyse if cloned
             if Path(f"repos/{id}") not in PATH_TO_REPOS.iterdir():
                 continue
 
+            if Path(f"analysis-results/{id}"
+                    ) in PATH_TO_ANALYSIS_RESULTS.iterdir():
+                continue
+
             # See https://github.com/python/mypy/issues/3717 for semantics of the report generated
-            os.system(
-                f"mypy ./repos/{id} --linecount-report ./analysis-results/{id}/"
-            )
+            proc = subprocess.run([
+                "mypy", f"./repos/{id}", "--linecount-report",
+                f"./analysis-results/{id}/"
+            ])
 
 
 def basic_plots() -> None:
@@ -60,18 +69,19 @@ def basic_plots() -> None:
             if Path(f"analysis-results/{id}"
                     ) not in PATH_TO_ANALYSIS_RESULTS.iterdir():
                 continue
+            try:
+                with open(f'analysis-results/{id}/linecount.txt') as f:
+                    lines = f.readlines()
+                    first_line = lines[0]
+                    values = first_line.split()
+                    total_lines = values[0]
+                    annotated_lines = values[2]
 
-            with open(f'analysis-results/{id}/linecount.txt') as f:
-                lines = f.readlines()
-                first_line = lines[0]
-                values = first_line.split()
-                total_lines = values[0]
-                annotated_lines = values[2]
-
-                if int(total_lines) != 0:
-                    ratio = (int(annotated_lines) / int(total_lines)) * 100
-
-                typedness_ratios.append(ratio)
+                    if int(total_lines) != 0:
+                        ratio = (int(annotated_lines) / int(total_lines)) * 100
+                        typedness_ratios.append(ratio)
+            except (FileNotFoundError):
+                pass
 
         x = range(len(typedness_ratios))
         plt.scatter(x,

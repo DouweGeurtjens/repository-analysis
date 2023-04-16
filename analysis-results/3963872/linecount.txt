@@ -1,0 +1,15 @@
+   2848    7315     85    261 total
+    781    1367      4      7 alexa_media
+    452     452     23     23 alexa_media.alexa_entity
+    316     316      7      7 alexa_media.helpers
+    262     901      7     24 alexa_media.config_flow
+    233     565     12     29 alexa_media.light
+    228     727     11     35 alexa_media.sensor
+    155     252      8     13 alexa_media.alarm_control_panel
+    133     133      0      0 alexa_media.const
+     90    1546      4     68 alexa_media.media_player
+     60     181      2      6 alexa_media.services
+     46     327      1      7 alexa_media.notify
+     45     121      3      8 alexa_media.binary_sensor
+     24      48      1      2 alexa_media.alexa_media
+     23     379      2     32 alexa_media.switch

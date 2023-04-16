@@ -14,5 +14,8 @@
 			"editor.tabSize": 4
 		},
 		"python.formatting.provider": "yapf",
+		"files.watcherExclude": {
+			"**/repos/**": true,
+		}
 	},
 }

@@ -1,0 +1,9 @@
+    267     312      5      7 total
+    144     144      5      5 designation_helper
+     44      44      0      0 deduplicate_keeping_last
+     44      44      0      0 deduplicate_keeping_first
+     23      23      0      0 setup
+     10      10      0      0 drop_duplicate_rows
+      2       2      0      0 pango_designation
+      0      39      0      1 sort_lineages
+      0       6      0      1 aliasing

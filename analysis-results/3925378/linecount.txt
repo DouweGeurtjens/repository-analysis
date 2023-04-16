@@ -1,0 +1,7 @@
+    551     568      0      1 total
+    363     363      0      0 conf
+    142     142      0      0 setup
+     17      17      0      0 invenio.version
+     15      15      0      0 invenio
+     14      14      0      0 conftest
+      0      17      0      1 test_invenio

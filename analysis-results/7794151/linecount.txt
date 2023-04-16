@@ -1,0 +1,14 @@
+    372    7152      0    429 total
+    150     150      0      0 wgsl_unit_tests_template
+     78      78      0      0 wgsl_unit_tests_equals
+     68      68      0      0 wgsl_unit_tests_simple
+     51      51      0      0 wgsl_unit_tests_enable
+     25      25      0      0 check-nfkc
+      0    3026      0    171 Grammar
+      0    1854      0    153 test
+      0     924      0     33 extract-grammar
+      0     421      0     44 TSPath
+      0     183      0      1 lalr
+      0     158      0     13 ObjectRegistry
+      0     150      0     10 wgsl_unit_tests
+      0      64      0      4 extract-idl-index
