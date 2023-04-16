@@ -43,9 +43,9 @@ def mypy_typedness_analysis() -> None:
             if Path(f"repos/{id}") not in PATH_TO_REPOS.iterdir():
                 continue
 
-            if Path(f"analysis-results/{id}"
-                    ) in PATH_TO_ANALYSIS_RESULTS.iterdir():
-                continue
+            # if Path(f"analysis-results/{id}"
+            #         ) in PATH_TO_ANALYSIS_RESULTS.iterdir():
+            #     continue
 
             # See https://github.com/python/mypy/issues/3717 for semantics of the report generated
             proc = subprocess.run([
