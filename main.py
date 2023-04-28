@@ -48,10 +48,19 @@ def mypy_typedness_analysis() -> None:
             #     continue
 
             # See https://github.com/python/mypy/issues/3717 for semantics of the report generated
-            proc = subprocess.run([
-                "mypy", f"./repos/{id}", "--linecount-report",
-                f"./analysis-results/{id}/"
-            ])
+            try:
+                subprocess.check_output([
+                    "mypy", f"./repos/{id}", "--linecount-report",
+                    f"./analysis-results/{id}/"
+                ])
+                subprocess.run(["touch", f"./analysis-results/{id}/SUCCESS"])
+            except subprocess.CalledProcessError as e:
+                # If we fail because of a syntax error, the repository should not be included in the analysis
+                # Reason being that syntax errors indicate that the repository is probably not maintained any longer
+                # We mark the repositories by creating an empty file in the respective analysis-results folder
+                if "[syntax]" in e.output.decode():
+                    subprocess.run(
+                        ["touch", f"./analysis-results/{id}/SYNTAX_ERROR"])
 
 
 def basic_plots() -> None:
@@ -69,6 +78,11 @@ def basic_plots() -> None:
             if Path(f"analysis-results/{id}"
                     ) not in PATH_TO_ANALYSIS_RESULTS.iterdir():
                 continue
+
+            # Skip any repos with syntax errors
+            if os.path.isfile(f"analysis-results/{id}/SYNTAX_ERROR"):
+                continue
+
             try:
                 with open(f'analysis-results/{id}/linecount.txt') as f:
                     lines = f.readlines()
@@ -80,10 +94,11 @@ def basic_plots() -> None:
                     if int(total_lines) != 0:
                         ratio = (int(annotated_lines) / int(total_lines)) * 100
                         typedness_ratios.append(ratio)
+                        x.append(repo['name'])
             except (FileNotFoundError):
                 pass
 
-        x = range(len(typedness_ratios))
+        # x = range(len(typedness_ratios))
         plt.scatter(x,
                     typedness_ratios,
                     c=['r' if i == 0 else 'b' for i in typedness_ratios])
@@ -97,7 +112,7 @@ def main() -> None:
     #   Use GitPython to checkout each commit and run some analysis on the typedness of a repository
     #   Try to make an initial classification of the type of repository (typehinting vs no typehinting)
     #   Evidently, this naive method of classification is not exhaustive but serves as a rough initial outline
-    clone_repos()
+    # clone_repos()
     mypy_typedness_analysis()
     basic_plots()
 
