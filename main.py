@@ -5,6 +5,7 @@ import subprocess
 
 from git import (Repo)
 import matplotlib.pyplot as plt
+import requests
 from tqdm import (tqdm)
 
 PATH_TO_REPOS = Path('./repos')
@@ -36,9 +37,10 @@ def mypy_typedness_analysis() -> None:
         for repo in tqdm(repos):
             id = repo['id']
 
-            # Mypy bricks on this repo
+            # Mypy bricks on this repo, as in it keeps going until my PC runs out of memory
             if id == 3992617:
                 continue
+
             # Only analyse if cloned
             if Path(f"repos/{id}") not in PATH_TO_REPOS.iterdir():
                 continue
@@ -63,12 +65,40 @@ def mypy_typedness_analysis() -> None:
                         ["touch", f"./analysis-results/{id}/SYNTAX_ERROR"])
 
 
+def get_bug_issues() -> None:
+    with open('data/results.json') as f:
+        results = json.load(f)
+        repos = results['items']
+
+        for repo in tqdm(repos):
+            id = repo['id']
+            name = repo['name']
+
+            # If Mypy didn't produce an output file for the repo we don't bother getting the issues
+            if not os.path.isfile(f"analysis-results/{id}/linecount.txt"):
+                continue
+
+            # Skip any repos with syntax errors
+            if os.path.isfile(f"analysis-results/{id}/SYNTAX_ERROR"):
+                continue
+
+            payload = {'state': 'closed', 'labels': 'bug'}
+            r = requests.get(f"https://api.github.com/repos/{name}/issues",
+                             params=payload)
+
+            # Write the entire JSON response to a file so we don't have to repull stuff from GitHub constantly
+            with open(f'analysis-results/{id}/issues.json', 'w') as of:
+                j = json.dumps(r.json())
+                of.write(j)
+
+
 def basic_plots() -> None:
     with open('data/results.json') as f:
         results = json.load(f)
         repos = results['items']
 
         typedness_ratios = []
+        bugs = []
         x = []
 
         for repo in tqdm(repos):
@@ -84,8 +114,8 @@ def basic_plots() -> None:
                 continue
 
             try:
-                with open(f'analysis-results/{id}/linecount.txt') as f:
-                    lines = f.readlines()
+                with open(f'analysis-results/{id}/linecount.txt') as lcf:
+                    lines = lcf.readlines()
                     first_line = lines[0]
                     values = first_line.split()
                     total_lines = values[0]
@@ -95,25 +125,31 @@ def basic_plots() -> None:
                         ratio = (int(annotated_lines) / int(total_lines)) * 100
                         typedness_ratios.append(ratio)
                         x.append(repo['name'])
+
+                with open(f'analysis-results/{id}/issues.json') as bf:
+                    r = json.loads(bf)
+                    bugs.append(len(r))
             except (FileNotFoundError):
                 pass
 
         # x = range(len(typedness_ratios))
-        plt.scatter(x,
-                    typedness_ratios,
-                    c=['r' if i == 0 else 'b' for i in typedness_ratios])
+        fig1, ax1 = plt.subplot().scatter(
+            x,
+            typedness_ratios,
+            c=['r' if i == 0 else 'b' for i in typedness_ratios])
+
+        fig2, ax2 = plt.subplot().scatter(typedness_ratios, bugs)
+
+        # plt.scatter(x,
+        #             typedness_ratios,
+        #             c=['r' if i == 0 else 'b' for i in typedness_ratios])
         plt.show()
 
 
 def main() -> None:
-    # General outline
-    #   Clone repos according to results from https://seart-ghs.si.usi.ch/
-    #   For each repo, use GitHub API to find several commit hashes based on their relative commit number
-    #   Use GitPython to checkout each commit and run some analysis on the typedness of a repository
-    #   Try to make an initial classification of the type of repository (typehinting vs no typehinting)
-    #   Evidently, this naive method of classification is not exhaustive but serves as a rough initial outline
     # clone_repos()
-    mypy_typedness_analysis()
+    # mypy_typedness_analysis()
+    get_bug_issues()
     basic_plots()
 
 
