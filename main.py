@@ -3,11 +3,15 @@ import os
 from pathlib import (Path)
 import subprocess
 
+from dotenv import load_dotenv
 from git import (Repo)
 import matplotlib.pyplot as plt
 import requests
 from tqdm import (tqdm)
 
+load_dotenv('.env.local')
+
+TOKEN = os.getenv('TOKEN')
 PATH_TO_REPOS = Path('./repos')
 PATH_TO_ANALYSIS_RESULTS = Path('./analysis-results')
 
@@ -67,6 +71,7 @@ def mypy_typedness_analysis() -> None:
 
 def get_bug_issues() -> None:
     with open('data/results.json') as f:
+        print(TOKEN)
         results = json.load(f)
         repos = results['items']
 
@@ -82,13 +87,23 @@ def get_bug_issues() -> None:
             if os.path.isfile(f"analysis-results/{id}/SYNTAX_ERROR"):
                 continue
 
+            headers = {'Authorization': f'token {TOKEN}'}
             payload = {'state': 'closed', 'labels': 'bug'}
+            bugs = []
+
             r = requests.get(f"https://api.github.com/repos/{name}/issues",
-                             params=payload)
+                             params=payload,
+                             headers=headers)
+            bugs.extend(r.json())
+
+            while 'next' in r.links:
+                next_url = r.links['next']['url']
+                r = requests.get(next_url, headers=headers)
+                bugs.extend(r.json())
 
             # Write the entire JSON response to a file so we don't have to repull stuff from GitHub constantly
             with open(f'analysis-results/{id}/issues.json', 'w') as of:
-                j = json.dumps(r.json())
+                j = json.dumps(bugs)
                 of.write(j)
 
 
@@ -126,19 +141,27 @@ def basic_plots() -> None:
                         typedness_ratios.append(ratio)
                         x.append(repo['name'])
 
-                with open(f'analysis-results/{id}/issues.json') as bf:
-                    r = json.loads(bf)
-                    bugs.append(len(r))
+                        with open(f'analysis-results/{id}/issues.json') as bf:
+                            j = json.load(bf)
+                            bugs.append(len(j))
             except (FileNotFoundError):
                 pass
 
-        # x = range(len(typedness_ratios))
-        fig1, ax1 = plt.subplot().scatter(
-            x,
-            typedness_ratios,
-            c=['r' if i == 0 else 'b' for i in typedness_ratios])
-
-        fig2, ax2 = plt.subplot().scatter(typedness_ratios, bugs)
+        x = range(len(typedness_ratios))
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        l = []
+        ll = []
+        for i in typedness_ratios:
+            if i == 0:
+                l.append(i)
+            else:
+                ll.append(i)
+        print(len(l))
+        print(len(ll))
+        ax1.scatter(x,
+                    typedness_ratios,
+                    c=['r' if i == 0 else 'b' for i in typedness_ratios])
+        ax2.scatter(bugs, typedness_ratios)
 
         # plt.scatter(x,
         #             typedness_ratios,
@@ -149,7 +172,7 @@ def basic_plots() -> None:
 def main() -> None:
     # clone_repos()
     # mypy_typedness_analysis()
-    get_bug_issues()
+    # get_bug_issues()
     basic_plots()
 
 
