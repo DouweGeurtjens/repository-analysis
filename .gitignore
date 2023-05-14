@@ -1,5 +1,7 @@
 __pycache__/
 .mypy_cache/
+.vscode/
 repos/*/
+miner/query-results/
 # local env files
 .env*.local
