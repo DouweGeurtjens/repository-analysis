@@ -136,7 +136,8 @@ def get_github_repos():
 
 def filter_repos():
     filtered_results = []
-
+    total_repos = 0
+    added_repos = 0
     query_results = os.listdir(
         os.path.join(CURRENT_DIRECTORY, './query-results'))
 
@@ -147,6 +148,7 @@ def filter_repos():
             query_result = json.load(f)
 
             for repo in query_result['data']['search']['edges']:
+                total_repos = total_repos + 1
                 if repo['node']['issues']['totalCount'] < 1000:
                     continue
                 if repo['node']['isFork']:
@@ -161,13 +163,18 @@ def filter_repos():
                     continue
 
                 filtered_results.append(repo['node']['nameWithOwner'])
+                added_repos = added_repos + 1
 
     with open(os.path.join(CURRENT_DIRECTORY, './filtered-results/res.json'),
               'w') as res_f:
         j = json.dumps(filtered_results)
         res_f.write(j)
 
+    print(
+        f'Checked {total_repos} repositories of which {added_repos} met the criteria for a ratio of {(added_repos/total_repos) * 100} precent'
+    )
+
 
 # create_date_range_tracker()
-get_github_repos()
-# filter_repos()
+# get_github_repos()
+filter_repos()
