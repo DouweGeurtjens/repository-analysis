@@ -1,0 +1,8 @@
+{
+    "number_param_types": 631,
+    "number_return_types": 197,
+    "number_variable_types": 145,
+    "number_non_param_types": 17478,
+    "number_non_return_types": 9346,
+    "number_non_variable_types": 24568
+}

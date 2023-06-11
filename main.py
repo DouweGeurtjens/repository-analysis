@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import (Path)
 import subprocess
+from papercode.TypeErrors.TypeAnnotationCounter import count_type_annotations
 
 from dotenv import load_dotenv
 from git import (Repo)
@@ -14,6 +15,7 @@ load_dotenv('.env.local')
 TOKEN = os.getenv('TOKEN')
 PATH_TO_REPOS = Path('./repos')
 PATH_TO_ANALYSIS_RESULTS = Path('./analysis-results')
+PATH_TO_ANALYSIS_RESULTS_PAPER = Path('./analysis-results-paper')
 
 
 def clone_repos() -> None:
@@ -169,11 +171,132 @@ def basic_plots() -> None:
         plt.show()
 
 
+def paper_typedness_analysis():
+    with open('data/results.json') as f:
+        results = json.load(f)
+        repos = results['items']
+
+        for repo in tqdm(repos):
+            id = repo['id']
+
+            # Bricks on this
+            if id == 3992617:
+                continue
+
+            # Only analyse if cloned
+            if Path(f"repos/{id}") not in PATH_TO_REPOS.iterdir():
+                continue
+
+            if Path(f"analysis-results-paper/{id}"
+                    ) in PATH_TO_ANALYSIS_RESULTS_PAPER.iterdir():
+                continue
+
+            # See https://github.com/python/mypy/issues/3717 for semantics of the report generated
+
+            number_param_types, number_return_types, number_variable_types, number_non_param_types, number_non_return_types, number_non_variable_types = count_type_annotations(
+                f"./repos/{id}")
+            dump = json.dumps(
+                {
+                    'number_param_types': number_param_types,
+                    'number_return_types': number_return_types,
+                    'number_variable_types': number_variable_types,
+                    'number_non_param_types': number_non_param_types,
+                    'number_non_return_types': number_non_return_types,
+                    'number_non_variable_types': number_non_variable_types
+                },
+                indent=4)
+            os.makedirs(os.path.dirname(
+                f'analysis-results-paper/{id}/paperanalysis.json'),
+                        exist_ok=True)
+            with open(f'analysis-results-paper/{id}/paperanalysis.json',
+                      'w') as of:
+                of.write(dump)
+
+    return None
+
+
+def basic_plots_paper():
+    with open('data/results.json') as f:
+        results = json.load(f)
+        repos = results['items']
+
+        typedness_ratios = []
+        bugs = []
+        x = []
+
+        for repo in tqdm(repos):
+            id = repo['id']
+
+            # Only plot if analysed
+            if Path(f"analysis-results-paper/{id}"
+                    ) not in PATH_TO_ANALYSIS_RESULTS_PAPER.iterdir():
+                continue
+
+            try:
+                with open(f'analysis-results-paper/{id}/paperanalysis.json'
+                          ) as lcf:
+                    ob = json.load(lcf)
+                    total = ob["number_param_types"] + ob[
+                        "number_return_types"] + ob[
+                            "number_variable_types"] + ob[
+                                "number_non_param_types"] + ob[
+                                    "number_non_return_types"] + ob[
+                                        "number_non_variable_types"]
+                    typed = ob["number_param_types"] + ob[
+                        "number_return_types"] + ob["number_variable_types"]
+                    if total != 0:
+                        ratio = (int(typed) / int(total)) * 100
+                        typedness_ratios.append(ratio)
+                        x.append(repo['name'])
+            except (FileNotFoundError):
+                pass
+
+        x = range(len(typedness_ratios))
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        l = []
+        ll = []
+        for i in typedness_ratios:
+            if i <= 5:
+                l.append(i)
+            else:
+                ll.append(i)
+        print(len(l))
+        print(len(ll))
+        ax1.scatter(x,
+                    typedness_ratios,
+                    c=['r' if i == 0 else 'b' for i in typedness_ratios])
+        # ax2.scatter(bugs, typedness_ratios)
+
+        # plt.scatter(x,
+        #             typedness_ratios,
+        #             c=['r' if i == 0 else 'b' for i in typedness_ratios])
+        plt.show()
+
+
+def results_union():
+    union = set()
+    with open('data/results.json') as f:
+        results = json.load(f)
+        repos = results['items']
+        for repo in repos:
+            union.add(repo['name'])
+    with open('miner/filtered-results/res.json') as f2:
+        results2 = json.load(f2)
+        for repo in results2:
+            union.add(repo)
+    with open('all_included_repos.json', 'w') as f3:
+        print(len(union))
+        f3.write(json.dumps(list(union)))
+
+
 def main() -> None:
     # clone_repos()
     # mypy_typedness_analysis()
+    # paper_typedness_analysis()
     # get_bug_issues()
-    basic_plots()
+    # basic_plots()
+    # results_union()
+    basic_plots_paper()
 
 
 main()
