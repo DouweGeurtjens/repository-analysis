@@ -30,3 +30,17 @@ errog log:
     You can inspect what was checked out with 'git status'
     and retry with 'git restore --source=HEAD :/'
 ```
+## Manually checked out repos
+92
+153
+262
+303
+362
+395
+411
+513
+518
+732
+869
+880
+891
