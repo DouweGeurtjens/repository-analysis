@@ -279,12 +279,12 @@ def results_union():
         results = json.load(f)
         repos = results['items']
         for repo in repos:
-            union.add(repo['name'])
+            union.add(repo['name'].lower())
     with open('miner/filtered-results/res.json') as f2:
         results2 = json.load(f2)
         for repo in results2:
-            union.add(repo)
-    with open('all_included_repos.json', 'w') as f3:
+            union.add(repo.lower())
+    with open('all_included_repos_1.json', 'w') as f3:
         print(len(union))
         f3.write(json.dumps(list(union)))
 
@@ -299,4 +299,6 @@ def main() -> None:
     basic_plots_paper()
 
 
-main()
+if __name__ == '__main__':
+    results_union()
+    # main()
