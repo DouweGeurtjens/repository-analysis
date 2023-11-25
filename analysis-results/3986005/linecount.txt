@@ -1,2 +1,0 @@
-      0      59      0      1 total
-      0      59      0      1 sort-redir

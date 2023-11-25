@@ -58,6 +58,8 @@ def extract_from_file(file_path: str):
 
 
 def count_type_annotations(project_path: str):
+    res = {}
+    res['total'] = {}
     number_param_types: int = 0
     number_return_types: int = 0
     number_variable_types: int = 0
@@ -72,12 +74,26 @@ def count_type_annotations(project_path: str):
             try:
                 param_types, return_types, variable_types, non_param_types, non_return_types, non_variable_types = extract_from_file(
                     str(filepath))
-                number_param_types += len(param_types)
-                number_return_types += len(return_types)
-                number_variable_types += len(variable_types)
-                number_non_param_types += len(non_param_types)
-                number_non_return_types += len(non_return_types)
-                number_non_variable_types += len(non_variable_types)
+                len_param_types = len(param_types)
+                len_return_types = len(return_types)
+                len_variable_types = len(variable_types)
+                len_non_param_types = len(non_param_types)
+                len_non_return_types = len(non_return_types)
+                len_non_variable_types = len(non_variable_types)
+                number_param_types += len_param_types
+                number_return_types += len_return_types
+                number_variable_types += len_variable_types
+                number_non_param_types += len_non_param_types
+                number_non_return_types += len_non_return_types
+                number_non_variable_types += len_non_variable_types
+                res[str(filepath)] = {
+                    'number_param_types': len_param_types,
+                    'number_return_types': len_return_types,
+                    'number_variable_types': len_variable_types,
+                    'number_non_param_types': len_non_param_types,
+                    'number_non_return_types': len_non_return_types,
+                    'number_non_variable_types': len_non_variable_types,
+                }
             except Exception as e:
                 #print(str(e))
                 continue
@@ -85,8 +101,13 @@ def count_type_annotations(project_path: str):
         counted += 1
         # if counted % 100 == 0:
         #    print(f"Counted annotations in {counted} files")
-
-    return number_param_types, number_return_types, number_variable_types, number_non_param_types, number_non_return_types, number_non_variable_types
+    res['total']['number_param_types'] = number_param_types
+    res['total']['number_return_types'] = number_return_types
+    res['total']['number_variable_types'] = number_variable_types
+    res['total']['number_non_param_types'] = number_non_param_types
+    res['total']['number_non_return_types'] = number_non_return_types
+    res['total']['number_non_variable_types'] = number_non_variable_types
+    return res
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ TOKEN = os.getenv('TOKEN')
 
 
 def create_date_range_tracker():
+    # Keeps track of which dates we've already mined
     daterange_tracker = os.path.join(CURRENT_DIRECTORY, './daterange.tracker')
     with open(daterange_tracker, 'w') as f:
         end = datetime.datetime.today()
@@ -135,6 +136,7 @@ def get_github_repos():
 
 
 def filter_repos():
+    # Apply the same filters as the ones used on SEART-GHS
     filtered_results = []
     total_repos = 0
     added_repos = 0
@@ -174,7 +176,7 @@ def filter_repos():
         f'Checked {total_repos} repositories of which {added_repos} met the criteria for a ratio of {(added_repos/total_repos) * 100} precent'
     )
 
-
-# create_date_range_tracker()
-# get_github_repos()
-filter_repos()
+if __name__ == '__main__':
+    create_date_range_tracker()
+    get_github_repos()
+    filter_repos()

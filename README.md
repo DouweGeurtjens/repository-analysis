@@ -1,32 +1,20 @@
 # repository-analysis
 
-This repository is a work in progress.
+## Attributions
+All code in  `./papercode` was taken from https://github.com/sola-st/PythonTypeAnnotationStudy
+<br>
+All code in `harmonic_mean_p.py` was taken from
 
-## Requirements
-python
-git
-git-lfs(?)
+## How to reproduce the research performed in the paper
+If you want to reproduce the research from scratch, start from step 1. Keep in mind that projects might have evolved since data collection, so results are expected to differ slightly if you start from scratch. If you wish to simply look at the regression results, start from step 8.
 
-# Broken repositories
-Some repositories fail during the cloning process for whatever reason. I have yet to resolve these issues, so for now the entries are removed from the `results.json` file and placed into the `removed_results.json` file instead. Below you can find the errors that occured for each broken repository.
-<br><br>
-```
-id: 3984919
-name: liberapay/liberapay.com
-errog log: 
-    git.exc.GitCommandError: Cmd('git') failed due to: exit code(128)
-    cmdline: git clone -v -- https://github.com/liberapay/liberapay.com repos/3984919
-    stderr: 'Cloning into 'repos/3984919'...
-    POST git-upload-pack (175 bytes)
-    POST git-upload-pack (gzip 35717 to 18015 bytes)
-    Downloading www/assets/fonts/ubuntu-bold-italic-webfont.ttf (357 KB)
-    Error downloading object: www/assets/fonts/ubuntu-bold-italic-webfont.ttf (2c33de3): Smudge error: Error downloading www/assets/fonts/ubuntu-bold-italic-webfont.ttf (2c33de34d51065a5e56bae5e1c7c13cd128268b26569838a38db038e6ac9723d): batch request: git@github.com: Permission denied (publickey).: exit status 255
 
-    Errors logged to '***/repos/3984919/.git/lfs/logs/20230325T173444.092742729.log***'.
-    Use `git lfs logs last` to view the log.
-    error: external filter 'git-lfs filter-process' failed
-    fatal: www/assets/fonts/ubuntu-bold-italic-webfont.ttf: smudge filter lfs failed
-    warning: Clone succeeded, but checkout failed.
-    You can inspect what was checked out with 'git status'
-    and retry with 'git restore --source=HEAD :/'
-```
+1. Create a `.env.local` file containing your GitHub API token in the following format `TOKEN=<your token here>`. A large amount of requests will be made to the GitHub API, so keep this in mind in case you are running other projects using the GitHub API as you will hit the rate-limit at some point.
+2. Adjust `PATH_TO_FOLDER_ON_DRIVE` in `settings.py` to point to your preffered folder. Cloned repositories will take up several hundred gigabytes, so make sure you have enough space available.
+3. Install all required packages from `requirements.txt`
+4. Run `miner.py`. It will mine GitHub for Python repositories. This will take several hours at least. If you hit the rate limit you will have to manually restart the script to continue. Your results might differ from ours due to the internal workings of the GitHub Search API.
+5. Run `results.py`. This combines the results from SEART-GHS and our miner.
+6. Run `clone.py`. This clones all repositories. Again, your results might differ from ours due to new commits being added since our data collection.
+7. Run `metrics.py`. This might take a while. Issue data might differ from ours due to additional issues being closed.
+8. Run `regression.py`. It will print descriptive statistics for the dataset and all model results.
+9. Edit `harmonic_mean_p.py` to use the p-values you found in the models. Run `harmonic_mean_p.py`

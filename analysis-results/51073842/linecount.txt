@@ -1,4 +1,0 @@
-    127     127      0      0 total
-     64      64      0      0 validateWeapons
-     38      38      0      0 validateReinforcements
-     25      25      0      0 validateSpells

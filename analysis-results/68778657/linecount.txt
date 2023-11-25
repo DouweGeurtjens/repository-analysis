@@ -1,7 +1,0 @@
-     34    7255      0    543 total
-     24      24      0      0 setup
-     10      10      0      0 d2l
-      0    2852      0    213 d2l.mxnet
-      0    2729      0    197 d2l.torch
-      0    1526      0    127 d2l.tensorflow
-      0     114      0      6 main

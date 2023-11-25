@@ -1,8 +1,0 @@
-     56     570      0     12 total
-     31      31      0      0 xlsx2tsv
-     25      25      0      0 tsv2xlsx
-      0     196      0      5 relabel
-      0     120      0      3 locate
-      0      83      0      2 sort-templates
-      0      72      0      1 validate-iris
-      0      43      0      1 update-term-reservations
